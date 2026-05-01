@@ -118,19 +118,3 @@ isort --check-only src/ tests/
 docker build --target development -t myapp:dev .
 docker run --rm myapp:dev
 ```
-
----
-
-##  Badges
-
-![Pytest](https://github.com/mashapresident/cicd_lab/workflows/1-pytest.yml/badge.svg)
-![Linting](https://github.com/mashapresident/cicd_lab/workflows/2-linting.yml/badge.svg)
-![Multi-version](https://github.com/mashapresident/cicd_lab/actions/workflows/3-multiversion.yml/badge.svg)
-![Docker](https://github.com/mashapresident/cicd_lab/actions/workflows/4-docker.yml/badge.svg)
-![Report](https://github.com/mashapresident/cicd_lab/actions/workflows/5-html-report.yml/badge.svg)
-
----
-
-## 👨‍💻 Автор
-
-Виконано в рамках вивчення GitHub Actions CI/CD.
