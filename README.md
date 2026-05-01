@@ -1,4 +1,4 @@
-# 🚀 GitHub Actions CI/CD Demo
+# GitHub Actions CI/CD Demo
 
 Демонстраційний проект для вивчення **GitHub Actions** — автоматизація тестування, лінтингу, збірки Docker та генерації звітів.
 
@@ -31,9 +31,9 @@
 
 ---
 
-## ⚙️ GitHub Actions Workflows
+## GitHub Actions Workflows
 
-### ✅ 1. Автоматичне тестування з Pytest
+### 1. Автоматичне тестування з Pytest
 **Файл:** `.github/workflows/1-pytest.yml`
 
 Автоматично запускає всі тести з `pytest` при кожному `push` або `pull_request`.
@@ -44,7 +44,7 @@
 
 ---
 
-### 🔍 2. Перевірка стилю коду (Linting)
+### 2. Перевірка стилю коду (Linting)
 **Файл:** `.github/workflows/2-linting.yml`
 
 Перевіряє якість і стиль коду за допомогою кількох інструментів:
@@ -58,7 +58,7 @@
 
 ---
 
-### 🐍 3. Мультиверсійне тестування
+### 3. Мультиверсійне тестування
 **Файл:** `.github/workflows/3-multiversion.yml`
 
 Запускає тести на **матриці** Python версій та операційних систем:
@@ -72,7 +72,7 @@
 
 ---
 
-### 🐳 4. Збірка Docker-контейнера
+### 4. Збірка Docker-контейнера
 **Файл:** `.github/workflows/4-docker.yml`
 
 Автоматично будує та тестує Docker-образ:
@@ -88,7 +88,7 @@ docker pull ghcr.io/<your-username>/<repo-name>:main
 
 ---
 
-### 📊 5. Автоматичний HTML-звіт
+### 5. Автоматичний HTML-звіт
 **Файл:** `.github/workflows/5-html-report.yml`
 
 Генерує красивий HTML-звіт з результатами тестів та покриттям коду:
@@ -98,11 +98,9 @@ docker pull ghcr.io/<your-username>/<repo-name>:main
 - Публікує звіт на **GitHub Pages**
 - Зберігає як artifact на 30 днів
 
-🌐 **Звіт доступний:** `https://<username>.github.io/<repo-name>/`
-
 ---
 
-## 🛠 Локальний запуск
+## Локальний запуск
 
 ```bash
 # Встановити залежності
@@ -123,13 +121,13 @@ docker run --rm myapp:dev
 
 ---
 
-## 📈 Badges
+##  Badges
 
-![Pytest](https://github.com/<username>/<repo>/actions/workflows/1-pytest.yml/badge.svg)
-![Linting](https://github.com/<username>/<repo>/actions/workflows/2-linting.yml/badge.svg)
-![Multi-version](https://github.com/<username>/<repo>/actions/workflows/3-multiversion.yml/badge.svg)
-![Docker](https://github.com/<username>/<repo>/actions/workflows/4-docker.yml/badge.svg)
-![Report](https://github.com/<username>/<repo>/actions/workflows/5-html-report.yml/badge.svg)
+![Pytest](https://github.com/mashapresident/cicd_lab/workflows/1-pytest.yml/badge.svg)
+![Linting](https://github.com/mashapresident/cicd_lab/workflows/2-linting.yml/badge.svg)
+![Multi-version](https://github.com/mashapresident/cicd_lab/actions/workflows/3-multiversion.yml/badge.svg)
+![Docker](https://github.com/mashapresident/cicd_lab/actions/workflows/4-docker.yml/badge.svg)
+![Report](https://github.com/mashapresident/cicd_lab/actions/workflows/5-html-report.yml/badge.svg)
 
 ---
 
