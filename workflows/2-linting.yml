@@ -1,0 +1,60 @@
+name: 2. Перевірка стилю коду (Linting)
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: Code Style Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pylint black isort
+
+      - name: Run flake8 (PEP8 style check)
+        run: |
+          echo "=== Running flake8 ==="
+          flake8 src/ tests/ \
+            --max-line-length=100 \
+            --extend-ignore=E203,W503 \
+            --statistics \
+            --count
+
+      - name: Run black (code formatting check)
+        run: |
+          echo "=== Running black ==="
+          black --check --diff src/ tests/ --line-length=100
+
+      - name: Run isort (import sorting check)
+        run: |
+          echo "=== Running isort ==="
+          isort --check-only --diff src/ tests/
+
+      - name: Run pylint (advanced static analysis)
+        run: |
+          echo "=== Running pylint ==="
+          pylint src/ \
+            --max-line-length=100 \
+            --disable=C0114,C0115,C0116 \
+            --fail-under=7.0
+
+      - name: Linting summary
+        if: always()
+        run: |
+          echo "🔍 Linting completed!"
+          echo "Tools used: flake8, black, isort, pylint"
