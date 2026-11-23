@@ -1,0 +1,154 @@
+openapi: 3.0.3
+info:
+  title: Podcast App API
+  version: 1.0.0
+  description: REST API серверної частини додатка для подкастів. Контракт між backend і Android-клієнтом.
+servers:
+  - url: http://localhost:8080/api/v1
+components:
+  securitySchemes:
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    Tokens:
+      type: object
+      properties: { accessToken: {type: string}, refreshToken: {type: string}, expiresInSec: {type: integer, format: int64} }
+    Error:
+      type: object
+      properties: { code: {type: string}, message: {type: string} }
+    Podcast:
+      type: object
+      properties:
+        id: {type: string, format: uuid}
+        title: {type: string}
+        author: {type: string}
+        description: {type: string, nullable: true}
+        coverUrl: {type: string, nullable: true}
+        feedUrl: {type: string}
+        language: {type: string, nullable: true}
+        category: {type: string, nullable: true}
+    Episode:
+      type: object
+      properties:
+        id: {type: string, format: uuid}
+        podcastId: {type: string, format: uuid}
+        title: {type: string}
+        description: {type: string, nullable: true}
+        audioUrl: {type: string}
+        durationSec: {type: integer, nullable: true}
+        publishedAt: {type: string, format: date-time}
+    Progress:
+      type: object
+      required: [positionSec]
+      properties: { positionSec: {type: integer}, completed: {type: boolean, default: false} }
+  parameters:
+    Page: { name: page, in: query, schema: {type: integer, default: 1, minimum: 1} }
+    Size: { name: size, in: query, schema: {type: integer, default: 20, minimum: 1, maximum: 50} }
+    Id:   { name: id, in: path, required: true, schema: {type: string, format: uuid} }
+paths:
+  /auth/register:
+    post:
+      summary: Реєстрація
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [email, password, displayName], properties: { email: {type: string}, password: {type: string, minLength: 8}, displayName: {type: string} } } } }
+      responses:
+        '201': { description: Створено, content: { application/json: { schema: { $ref: '#/components/schemas/Tokens' } } } }
+        '400': { description: Помилка валідації }
+        '409': { description: EMAIL_TAKEN }
+  /auth/login:
+    post:
+      summary: Вхід
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { email: {type: string}, password: {type: string} } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Tokens' } } } }
+        '401': { description: Невірна пошта або пароль }
+  /auth/refresh:
+    post:
+      summary: Оновлення пари токенів (refresh-токен одноразовий)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { refreshToken: {type: string} } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Tokens' } } } }
+        '401': { description: Сесія завершилась }
+  /users/me:
+    get:
+      security: [ { bearer: [] } ]
+      summary: Профіль
+      responses: { '200': { description: OK }, '401': { description: Немає токена } }
+  /categories:
+    get:
+      summary: Категорії
+      responses: { '200': { description: OK } }
+  /podcasts:
+    get:
+      summary: Пошук і список подкастів
+      parameters:
+        - { name: query, in: query, schema: {type: string} }
+        - { name: category, in: query, schema: {type: integer} }
+        - { $ref: '#/components/parameters/Page' }
+        - { $ref: '#/components/parameters/Size' }
+      responses: { '200': { description: "Сторінка { items, page, size, total }" } }
+  /podcasts/import:
+    post:
+      security: [ { bearer: [] } ]
+      summary: Імпорт подкасту за RSS
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { feedUrl: {type: string} } } } }
+      responses: { '200': { description: "{ podcast, newEpisodes }" }, '422': { description: Стрічка недоступна або некоректна } }
+  /podcasts/{id}:
+    get:
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { description: OK }, '404': { description: Не знайдено } }
+  /podcasts/{id}/episodes:
+    get:
+      parameters: [ { $ref: '#/components/parameters/Id' }, { $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/Size' } ]
+      responses: { '200': { description: Епізоди від нових до старих } }
+  /podcasts/{id}/subscribe:
+    post:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '204': { description: Підписано (ідемпотентно) } }
+    delete:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '204': { description: Відписано } }
+  /episodes/{id}:
+    get:
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '200': { description: OK } }
+  /episodes/{id}/favorite:
+    post:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '204': { description: Додано } }
+    delete:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      responses: { '204': { description: Прибрано } }
+  /episodes/{id}/progress:
+    put:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Id' } ]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/Progress' } } }
+      responses: { '204': { description: Збережено } }
+  /me/subscriptions:
+    get:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/Size' } ]
+      responses: { '200': { description: Сторінка подкастів } }
+  /me/favorites:
+    get:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/Size' } ]
+      responses: { '200': { description: Сторінка епізодів } }
+  /me/history:
+    get:
+      security: [ { bearer: [] } ]
+      parameters: [ { $ref: '#/components/parameters/Page' }, { $ref: '#/components/parameters/Size' } ]
+      responses: { '200': { description: "Сторінка { episode, positionSec, completed, updatedAt }" } }
